@@ -1,0 +1,9 @@
+# handlers file for ssh-server
+---
+- name: restart ssh
+  service:
+    name: ssh
+    state: restarted
+  become: true
+
+# vim:ft=ansible :

@@ -1,0 +1,83 @@
+# tasks file for ssh-server
+---
+- name: Check for keys and generate if needed
+  local_action: >
+    command  ssh-keygen -t rsa -f "{{ item }}" -N ''
+  args:
+    creates: "{{ item }}"
+  register: check_host_keys
+  changed_when: "'Generating public/private rsa key pair.' \
+                in check_host_keys.stdout"
+  with_items: "{{ ssh_server_host_keys }}"
+  when: item != ''
+  tags:
+    - ssh-server
+    - ssh-server-check-host-keys
+
+
+- name: Generate remote key
+  command: ssh-keygen -t rsa -f "{{ item }}" -N ''
+  args:
+    creates: "{{ item }}"
+  register: check_remote_keys
+  changed_when: "'Generating public/private rsa key pair.' \
+                in check_remote_keys.stdout"
+  with_items: "{{ ssh_server_remote_keys }}"
+  #when: item != ''
+  tags:
+    - ssh-server
+    - ssh-server-check-remote-keys
+
+
+- name: Install / Update ssh server
+  apt:
+    name: "{{ item }}"
+    state: "{{ apt_install_state | default('latest') }}"
+    update_cache: true
+    cache_valid_time: "{{ apt_update_cache_valid_time | default(3600) }}"
+  with_items: "{{ ssh_server_install | default('openssh-server') }}"
+  become: true
+  tags:
+    - ssh-server
+    - ssh-server-install
+
+
+- name: Update configuration file
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+    validate: 'sshd -T -f %s'
+  notify: restart ssh
+  become: true
+  tags:
+    - ssh-server
+    - ssh-server-config
+
+
+- name: Create groups
+  group:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ ssh_server_allow_groups + ssh_server_deny_groups | default([]) }}"
+  become: yes
+  tags:
+    - system
+    - users
+    - users-create
+
+
+- name: Start and enable ssh service
+  service:
+    name: ssh
+    state: started
+    enabled: true
+  become: true
+  tags:
+    - ssh-server
+    - ssh-server-start-enable-service
+
+
+# vim:ft=ansible :

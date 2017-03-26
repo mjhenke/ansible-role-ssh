@@ -1,0 +1,4 @@
+[clog]
+changelog = "CHANGELOG.md"
+repository = "https://github.com/mjhenke/ansible-role-ssh"
+from-latest-tag = true

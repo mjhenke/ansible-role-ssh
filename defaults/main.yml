@@ -1,0 +1,24 @@
+# defaults file for ssh-server
+---
+
+ssh_server_host_keys:
+  - ~/.ssh/id_rsa
+  - "{{ ssh_server_user_key }}"
+
+ssh_server_remote_keys:
+  - ~/.ssh/id_rsa
+
+ssh_server_x11_forwarding: true
+ssh_server_x11_display_offset: 10
+ssh_server_x11_use_localhost: false
+
+ssh_server_permit_root_login: "{{ 'without-password' if (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '>=')) else 'yes' }}"
+
+ssh_server_allow_groups: 
+  - sshlogin 
+
+ssh_server_allow_users: []
+ssh_server_deny_groups: []
+ssh_server_deny_users: []
+
+# vim:ft=ansible :

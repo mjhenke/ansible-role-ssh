@@ -1,0 +1,6 @@
+---
+- hosts: all
+  roles:
+    - ansible-role-ssh
+
+# vim:ft=ansible :

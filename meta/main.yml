@@ -1,0 +1,29 @@
+# meta file for ssh-server
+---
+galaxy_info:
+  author: Michael Henke
+  description: Set up host OpenSSH server
+  license: MIT
+
+  min_ansible_version: 2.1
+
+  platforms:
+  - name: Ubuntu
+    versions:
+    - trusty
+#    - xenial
+#  - name: Debian
+#    versions:
+#    - jessie
+#    - wheezy
+
+  galaxy_tags:
+    - system
+    - networking
+ 
+  categories:
+    - development
+
+dependencies: []
+# - { role: <my repo>.repo, when: "ansible_os_family == '<distro>'" }
+# - { role: <my repo>.git }
