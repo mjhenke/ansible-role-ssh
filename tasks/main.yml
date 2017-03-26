@@ -1,35 +1,42 @@
 # tasks file for ssh-server
 ---
-- name: Check for keys and generate if needed
+- name: Check for local key and generate if needed
   local_action: >
-    command  ssh-keygen -t rsa -f "{{ item }}" -N ''
+    command  ssh-keygen -t rsa -f "{{ ssh_server_host_key | default('~/.ssh/id_rsa') }}" -N ''
   args:
-    creates: "{{ item }}"
-  register: check_host_keys
+    creates: "{{ ssh_server_host_key | default('~/.ssh/id_rsa') }}"
+  register: check_host_key
   changed_when: "'Generating public/private rsa key pair.' \
-                in check_host_keys.stdout"
-  with_items: "{{ ssh_server_host_keys }}"
-  when: item != ''
+                in check_host_key.stdout"
   tags:
     - ssh-server
-    - ssh-server-check-host-keys
+    - ssh-server-check-host-key
+
+
+- name: Authorize key for local user
+  authorized_key:
+    user: "{{ ansible_ssh_user }}"
+    state: present
+    key: "{{ lookup('file', ssh_server_host_key | default('~/.ssh/id_rsa') + '.pub') }}"
+  tags:
+    - ssh-server
+    - ssh-server-authorized-key
 
 
 - name: Generate remote key
-  command: ssh-keygen -t rsa -f "{{ item }}" -N ''
+  command: ssh-keygen -t rsa -f "{{ ssh_server_remote_key }}" -N ''
   args:
-    creates: "{{ item }}"
-  register: check_remote_keys
+    creates: "{{ ssh_server_remote_key }}"
+  register: check_remote_key
   changed_when: "'Generating public/private rsa key pair.' \
-                in check_remote_keys.stdout"
-  with_items: "{{ ssh_server_remote_keys }}"
-  #when: item != ''
+                in check_remote_key.stdout"
+  when: ssh_server_remote_key is defined and ssh_server_remote_key 
   tags:
     - ssh-server
-    - ssh-server-check-remote-keys
+    - ssh-server-check-remote-key
 
 
-- name: Install / Update ssh server
+- name: Install/update ssh server
   apt:
     name: "{{ item }}"
     state: "{{ apt_install_state | default('latest') }}"

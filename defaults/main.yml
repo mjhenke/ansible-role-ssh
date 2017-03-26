@@ -1,12 +1,8 @@
 # defaults file for ssh-server
 ---
 
-ssh_server_host_keys:
-  - ~/.ssh/id_rsa
-  - "{{ ssh_server_user_key }}"
-
-ssh_server_remote_keys:
-  - ~/.ssh/id_rsa
+ssh_server_host_key: ~/.ssh/id_rsa
+ssh_server_remote_key:
 
 ssh_server_x11_forwarding: true
 ssh_server_x11_display_offset: 10
