@@ -1,7 +1,7 @@
 # defaults file for ssh-server
 ---
 
-ssh_server_host_key: ~/.ssh/id_rsa
+ssh_server_local_key: ~/.ssh/id_rsa
 ssh_server_remote_key:
 
 ssh_server_x11_forwarding: true

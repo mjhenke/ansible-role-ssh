@@ -2,22 +2,22 @@
 ---
 - name: Check for local key and generate if needed
   local_action: >
-    command  ssh-keygen -t rsa -f "{{ ssh_server_host_key | default('~/.ssh/id_rsa') }}" -N ''
+    command  ssh-keygen -t rsa -f "{{ ssh_server_local_key | default('~/.ssh/id_rsa') }}" -N ''
   args:
-    creates: "{{ ssh_server_host_key | default('~/.ssh/id_rsa') }}"
-  register: check_host_key
+    creates: "{{ ssh_server_local_key | default('~/.ssh/id_rsa') }}"
+  register: check_local_key
   changed_when: "'Generating public/private rsa key pair.' \
-                in check_host_key.stdout"
+                in check_local_key.stdout"
   tags:
     - ssh-server
-    - ssh-server-check-host-key
+    - ssh-server-check-local-key
 
 
 - name: Authorize key for local user
   authorized_key:
     user: "{{ ansible_ssh_user }}"
     state: present
-    key: "{{ lookup('file', ssh_server_host_key | default('~/.ssh/id_rsa') + '.pub') }}"
+    key: "{{ lookup('file', ssh_server_local_key | default('~/.ssh/id_rsa') + '.pub') }}"
   tags:
     - ssh-server
     - ssh-server-authorized-key
